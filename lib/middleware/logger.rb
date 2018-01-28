@@ -13,6 +13,8 @@ class AppLogger
     [status, headers, body]  
   end
 
+  private
+
   def logger_format(env, status, headers)
     @logger.formatter = proc do
   <<-EOS

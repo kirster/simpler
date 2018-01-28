@@ -24,8 +24,13 @@ module Simpler
       private
 
       def self.actions(action)
-        @@actions ||= []
-        @@actions << action
+        @actions ||= []
+        @actions << action
+        @actions = @actions.uniq
+      end
+
+      def self.get_actions
+        @actions
       end
 
       def parse_route(path)
@@ -39,8 +44,9 @@ module Simpler
           if param?(element, path_segments[index]) && !action?(path_segments[index])
             set_route_params(element, path_segments[index])
             next
+          else
+            return false unless element == path_segments[index]
           end
-          return false unless element == path_segments[index]
         end    
         true
       end
@@ -50,12 +56,16 @@ module Simpler
       end
 
       def action?(path_element)
-        @@actions.include? path_element
+        self.class.get_actions.include? path_element
       end
       
       def set_route_params(element, path_element)
         element = element.delete(":").to_sym
-        @route_params[element] = path_element.to_i
+        if path_element.to_i > 0
+          @route_params[element] = path_element.to_i
+        else
+          @route_params[element] = path_element
+        end
       end
 
       def equal_size?(app_path_segments, path_segments)
